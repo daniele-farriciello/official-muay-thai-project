@@ -10,16 +10,20 @@ import { RegoularH1, RegoularH2 } from "../../components/Typography/Typography";
 import dashboardTheme from '../../components/DashboardTheme/DashboardTheme';
 import AlertModal from "../../components/AlertModal/AlertModal";
 import TimeRemaining from "../../components/TimeRemaining/TimeRemaining";
+import { number as validateCardNumber, cvv as validateCvv, expirationDate as validateExpirationDate } from 'card-validator';
+
 
 export default function MembershipPage() {
     const { user, setUser } = useUser();
     const navigate = useNavigate();
 
     const [activationDay, setActivationDay] = useState(null);
+
     const [cardName, setCardName] = useState('');
     const [cardNumber, setCardNumber] = useState('');
     const [cvv, setCvv] = useState('');
     const [expiryDate, setExpiryDate] = useState(null);
+
     const [modalOpen, setModalOpen] = useState(false);
     const [modalMessage, setModalMessage] = useState(null);
     const [redirectWithData, setRedirectWithData] = useState(false);
@@ -40,8 +44,33 @@ export default function MembershipPage() {
         );
     }
 
+    function validateCardDetails() {
+        const numberValidation = validateCardNumber(cardNumber);
+        if (!numberValidation.isValid) {
+            return "Invalid card number.";
+        }
+
+        const cvvValidation = validateCvv(cvv);
+        if (!cvvValidation.isValid) {
+            return "Invalid CVV.";
+        }
+
+        const expiryValidation = validateExpirationDate(expiryDate);
+        if (!expiryValidation.isValid) {
+            return "Invalid expiry date.";
+        }
+        return "";
+    }
+
     async function submit(e) {
         e.preventDefault();
+
+        const cardValidationMessage = validateCardDetails();
+        if (cardValidationMessage) {
+            setModalMessage(cardValidationMessage);
+            setModalOpen(true);
+            return;
+        }
 
         if (!isFormValid()) {
             setModalMessage("Complete the form befor submitting.");
@@ -87,7 +116,7 @@ export default function MembershipPage() {
         const member = {
             email: user.email
         };
-    
+
         try {
             const response = await fetch('http://localhost:3001/removeMembership', {
                 method: 'POST',
@@ -96,9 +125,9 @@ export default function MembershipPage() {
                 },
                 body: JSON.stringify(member)
             });
-    
+
             const data = await response.json();
-    
+
             if (response.ok) {
                 setModalMessage(data.message);
                 setModalOpen(true);
@@ -115,7 +144,8 @@ export default function MembershipPage() {
             setModalOpen(true);
         }
     }
-    
+
+
 
     return (
         <div className="membership-page">
