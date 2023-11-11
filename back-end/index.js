@@ -1,13 +1,7 @@
 const express = require("express"); // Load the express module to help create the server.
 const cors = require("cors");  // Load the CORS middleware to enable cross-origin requests.
 const bcrypt = require('bcrypt');  // Load bcrypt for hashing passwords.
-const mongoose = require('mongoose');  // Load mongoose to interact with MongoDB.
-
-// FOR COOKIES
-// const session = require('express-session');
-
-// // FOR COOKIES
-// const MongoStore = require('connect-mongo');
+const mongoose = require('mongoose');  // Load mongoose to interact with MongoDB.xw
 
 const PORT = 3001;
 const app = express();
@@ -17,33 +11,6 @@ app.use(cors({
     credentials: true
 }));
 app.use(express.json());
-
-// // FOR COOKIES
-// app.use(session({
-//     secret: 'secret-key',
-//     resave: false,
-//     saveUninitialized: false,
-//     store: new MongoStore({ mongoUrl: 'mongodb://localhost/Database-Project' }),
-//     cookie: {
-//         sameSite: process.env.NODE_ENV === "production" ? 'none' : 'lax', // Use 'none' for production
-//         secure: process.env.NODE_ENV === "production", // Only set secure if in production
-//         httpOnly: true,
-//         maxAge: 24 * 60 * 60 * 1000 // 24 hours
-//     }
-// }));
-
-// console.log("Environment:", process.env.NODE_ENV);
-
-// // FOR COOKIES
-// const sessionStore = new MongoStore({
-//     mongoUrl: 'mongodb://localhost/Database-Project',
-//     collectionName: 'sessions'
-// });
-
-// // FOR COOKIES
-// sessionStore.on('error', function(error){
-//     console.log("SESSION STORE ERROR:", error);
-// });
 
 const dbUrl = "mongodb://localhost:27017/Database-Project";
 
@@ -120,10 +87,6 @@ app.post('/login', async (req, res) => {
     if (!validPassword) {
         return res.status(401).json({ message: 'Invalid email or password' });
     }
-
-    // // FOR COOKIES
-    // req.session.userId = user._id; // Save the user's ID in the session
-    // req.session.isAuthenticated = true;
 
     res.status(200).json({ message: 'Logged in successfully' });
 });
