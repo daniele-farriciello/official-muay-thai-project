@@ -62,7 +62,10 @@ export default function Bookings() {
                         return index !== currentPage - 1
                     })]
                   });
-                  setCurrentPage(currentPage - 1);
+                  if (currentPage !== 1) {
+                    setCurrentPage(currentPage - 1);
+                  }
+                  
             }
         } catch (error) {
             setModalMessage(error.message);

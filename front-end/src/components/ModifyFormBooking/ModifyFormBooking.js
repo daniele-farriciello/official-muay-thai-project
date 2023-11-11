@@ -45,7 +45,7 @@ export default function ModifyFormBooking({ setModifyOpen, currentBooking }) {
 
         try {
             const response = await fetch('http://localhost:3001/modifyBooking', {
-                method: 'POST',
+                method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
                 },

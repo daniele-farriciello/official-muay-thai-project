@@ -3,13 +3,18 @@ const cors = require("cors");  // Load the CORS middleware to enable cross-origi
 const bcrypt = require('bcrypt');  // Load bcrypt for hashing passwords.
 const mongoose = require('mongoose');  // Load mongoose to interact with MongoDB.xw
 
+const corsOptions = {
+    origin: 'http://localhost:3000', // Adjust this if your front-end is hosted elsewhere
+    methods: ['GET', 'POST', 'PATCH', 'DELETE'], // Include 'PATCH' in the allowed methods
+    credentials: true,
+    optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+};
+
 const PORT = 3001;
 const app = express();
 
-app.use(cors({
-    origin: 'http://localhost:3000',
-    credentials: true
-}));
+app.use(cors(corsOptions));
+
 app.use(express.json());
 
 const dbUrl = "mongodb://localhost:27017/Database-Project";
@@ -111,26 +116,54 @@ app.post('/newBooking', async (req, res) => {
     }
 });
 
-app.post('/modifyBooking', async (req, res) => {
+// app.post('/modifyBooking', async (req, res) => {
+//     const { email, fullname, birthdayDate, trainingDate, bookingSelected } = req.body;
+
+//     const user = await User.findOne({ email: email });
+
+//     // Find the index of the booking you want to modify
+//     if (bookingSelected === -1) {
+//         return res.status(404).json({ message: 'Booking not found' });
+//     }
+
+//     // Update the booking at that index
+//     user.bookings[bookingSelected] = {
+//         ...user.bookings[bookingSelected],
+//         fullname,
+//         birthdayDate,
+//         trainingDate
+//     }
+
+//     try {
+//         await user.save();
+//         res.status(200).json({ message: 'Booking modified successfully' });
+//     } catch (error) {
+//         res.status(500).json({ message: 'Error updating booking' });
+//     }
+// });
+
+app.patch('/modifyBooking', async (req, res) => {
     const { email, fullname, birthdayDate, trainingDate, bookingSelected } = req.body;
 
-    const user = await User.findOne({ email: email });
-
-    // Find the index of the booking you want to modify
-    if (bookingSelected === -1) {
-        return res.status(404).json({ message: 'Booking not found' });
-    }
-
-    // Update the booking at that index
-    user.bookings[bookingSelected] = {
-        ...user.bookings[bookingSelected],
-        fullname,
-        birthdayDate,
-        trainingDate
-    }
+    // Create an update object dynamically to modify only the specified booking
+    let update = {
+        [`bookings.${bookingSelected}.fullname`]: fullname,
+        [`bookings.${bookingSelected}.birthdayDate`]: birthdayDate,
+        [`bookings.${bookingSelected}.trainingDate`]: trainingDate
+    };
 
     try {
-        await user.save();
+        // Directly update the booking in the database
+        const result = await User.updateOne(
+            { email: email },
+            { $set: update }
+        );
+
+        // Check if the update operation modified any document
+        if (result.nModified === 0) {
+            return res.status(404).json({ message: 'Booking not found or no changes made' });
+        }
+
         res.status(200).json({ message: 'Booking modified successfully' });
     } catch (error) {
         res.status(500).json({ message: 'Error updating booking' });
