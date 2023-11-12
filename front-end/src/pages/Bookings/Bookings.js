@@ -24,7 +24,6 @@ export default function Bookings() {
 
     function handleNextBooking(event, value) {
         setCurrentPage(value);
-        console.log(user.bookings[currentPage - 1])
     }
 
     useEffect(() => {
@@ -48,7 +47,7 @@ export default function Bookings() {
                 },
                 body: JSON.stringify({
                     email: user.email,
-                    bookingSelected: currentPage - 1
+                    bookingSelected: currentPage
                 }),
             });
 
@@ -57,6 +56,16 @@ export default function Bookings() {
             if (response.ok) {
                 setModalMessage(data.message);
                 setModalOpen(true);
+                setUser({ //it update without refreshing the page the data, in order to shows the last booking added
+                    ...user,
+                    bookings: [...user.bookings.filter((booking, index) => {
+                        return index !== currentPage - 1
+                    })]
+                  });
+                  if (currentPage !== 1) {
+                    setCurrentPage(currentPage - 1);
+                  }
+                  
             }
         } catch (error) {
             setModalMessage(error.message);
@@ -71,10 +80,6 @@ export default function Bookings() {
                 onClose={() => {
                     setModalOpen(false);
                     setModalMessage(null);
-                    setUser({ //it update without refreshing the page the data, in order to shows the last booking added
-                        ...user,
-                        bookings: [...user.bookings]
-                    });
                     // if i don't use these statement it will navigate straigh away, without showing the modal
                     if (redirectWithData) {
                         navigate("/newBooking", { state: { id: user.email } });

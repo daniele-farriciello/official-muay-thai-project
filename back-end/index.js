@@ -1,49 +1,21 @@
 const express = require("express"); // Load the express module to help create the server.
 const cors = require("cors");  // Load the CORS middleware to enable cross-origin requests.
 const bcrypt = require('bcrypt');  // Load bcrypt for hashing passwords.
-const mongoose = require('mongoose');  // Load mongoose to interact with MongoDB.
+const mongoose = require('mongoose');  // Load mongoose to interact with MongoDB.xw
 
-// FOR COOKIES
-// const session = require('express-session');
-
-// // FOR COOKIES
-// const MongoStore = require('connect-mongo');
+const corsOptions = {
+    origin: 'http://localhost:3000', // Adjust this if your front-end is hosted elsewhere
+    methods: ['GET', 'POST', 'PATCH', 'DELETE'], // Include 'PATCH' in the allowed methods
+    credentials: true,
+    optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+};
 
 const PORT = 3001;
 const app = express();
 
-app.use(cors({
-    origin: 'http://localhost:3000',
-    credentials: true
-}));
+app.use(cors(corsOptions));
+
 app.use(express.json());
-
-// // FOR COOKIES
-// app.use(session({
-//     secret: 'secret-key',
-//     resave: false,
-//     saveUninitialized: false,
-//     store: new MongoStore({ mongoUrl: 'mongodb://localhost/Database-Project' }),
-//     cookie: {
-//         sameSite: process.env.NODE_ENV === "production" ? 'none' : 'lax', // Use 'none' for production
-//         secure: process.env.NODE_ENV === "production", // Only set secure if in production
-//         httpOnly: true,
-//         maxAge: 24 * 60 * 60 * 1000 // 24 hours
-//     }
-// }));
-
-// console.log("Environment:", process.env.NODE_ENV);
-
-// // FOR COOKIES
-// const sessionStore = new MongoStore({
-//     mongoUrl: 'mongodb://localhost/Database-Project',
-//     collectionName: 'sessions'
-// });
-
-// // FOR COOKIES
-// sessionStore.on('error', function(error){
-//     console.log("SESSION STORE ERROR:", error);
-// });
 
 const dbUrl = "mongodb://localhost:27017/Database-Project";
 
@@ -121,10 +93,6 @@ app.post('/login', async (req, res) => {
         return res.status(401).json({ message: 'Invalid email or password' });
     }
 
-    // // FOR COOKIES
-    // req.session.userId = user._id; // Save the user's ID in the session
-    // req.session.isAuthenticated = true;
-
     res.status(200).json({ message: 'Logged in successfully' });
 });
 
@@ -148,26 +116,54 @@ app.post('/newBooking', async (req, res) => {
     }
 });
 
-app.post('/modifyBooking', async (req, res) => {
+// app.post('/modifyBooking', async (req, res) => {
+//     const { email, fullname, birthdayDate, trainingDate, bookingSelected } = req.body;
+
+//     const user = await User.findOne({ email: email });
+
+//     // Find the index of the booking you want to modify
+//     if (bookingSelected === -1) {
+//         return res.status(404).json({ message: 'Booking not found' });
+//     }
+
+//     // Update the booking at that index
+//     user.bookings[bookingSelected] = {
+//         ...user.bookings[bookingSelected],
+//         fullname,
+//         birthdayDate,
+//         trainingDate
+//     }
+
+//     try {
+//         await user.save();
+//         res.status(200).json({ message: 'Booking modified successfully' });
+//     } catch (error) {
+//         res.status(500).json({ message: 'Error updating booking' });
+//     }
+// });
+
+app.patch('/modifyBooking', async (req, res) => {
     const { email, fullname, birthdayDate, trainingDate, bookingSelected } = req.body;
 
-    const user = await User.findOne({ email: email });
-
-    // Find the index of the booking you want to modify
-    if (bookingSelected === -1) {
-        return res.status(404).json({ message: 'Booking not found' });
-    }
-
-    // Update the booking at that index
-    user.bookings[bookingSelected] = {
-        ...user.bookings[bookingSelected],
-        fullname,
-        birthdayDate,
-        trainingDate
-    }
+    // Create an update object dynamically to modify only the specified booking
+    let update = {
+        [`bookings.${bookingSelected}.fullname`]: fullname,
+        [`bookings.${bookingSelected}.birthdayDate`]: birthdayDate,
+        [`bookings.${bookingSelected}.trainingDate`]: trainingDate
+    };
 
     try {
-        await user.save();
+        // Directly update the booking in the database
+        const result = await User.updateOne(
+            { email: email },
+            { $set: update }
+        );
+
+        // Check if the update operation modified any document
+        if (result.nModified === 0) {
+            return res.status(404).json({ message: 'Booking not found or no changes made' });
+        }
+
         res.status(200).json({ message: 'Booking modified successfully' });
     } catch (error) {
         res.status(500).json({ message: 'Error updating booking' });
