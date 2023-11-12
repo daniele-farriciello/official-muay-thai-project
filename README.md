@@ -5,9 +5,8 @@
 
 ## Front-end setup
 1.  Open your terminal
-2.  Navigate to the 'client' directory typing on the terminal: 
+2.  Navigate to the 'front-end' directory typing on the terminal: 
     cd front-end
-    cd client
 3.  To install the dependecies: npm install
 
 ## Run the project
