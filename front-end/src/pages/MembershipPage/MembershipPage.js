@@ -11,7 +11,11 @@ import dashboardTheme from '../../components/DashboardTheme/DashboardTheme';
 import AlertModal from "../../components/AlertModal/AlertModal";
 import TimeRemaining from "../../components/TimeRemaining/TimeRemaining";
 import { number as validateCardNumber, cvv as validateCvv, expirationDate as validateExpirationDate } from 'card-validator';
-
+import Accordion from '@mui/material/Accordion';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import Typography from '@mui/material/Typography';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 export default function MembershipPage() {
     const { user, setUser } = useUser();
@@ -164,14 +168,14 @@ export default function MembershipPage() {
                 {modalMessage}
             </AlertModal>
             {user && user.member && user.member.activationDay ? (
-                <Container maxWidth="sm">
-                    <Box width={"95%"} ml={4} pt={20} pb={5}>
+                <Container maxWidth="md" sx={{ display: 'flex', justifyContent: 'center-top', alignItems: 'center', height: '100%' }}>
+                    <Box width={"95%"}>
                         <Paper
                             sx={{
                                 marginLeft: 6,
                                 padding: 2,
                                 width: '100%',
-                                backgroundColor: alpha(dashboardTheme.palette.secondary.light, 0.4),
+                                backgroundColor: alpha(dashboardTheme.palette.secondary.light, 0.5),
                                 borderRadius: '20px'
                             }}>
                             <RegoularH2 color={dashboardTheme.palette.primary.light}>{user && user.member && user.member.activationDay ? `Membership Start Date: ${new Date(user.member.activationDay).toLocaleDateString()}` : ''}</RegoularH2>
@@ -182,6 +186,7 @@ export default function MembershipPage() {
                                 sx={{
                                     fontFamily: 'Playfair Display, serif',
                                     fontWeight: '500%',
+                                    fontSize: '130%',
                                     backgroundColor: alpha(dashboardTheme.palette.secondary.light, 1),
                                     transition: 'transform 0.5s, color 0.5s, background 0.5s',
                                     ':hover': {
@@ -192,6 +197,18 @@ export default function MembershipPage() {
                             >
                                 Remove memberhsip
                             </Button>
+                            <Accordion>
+                                <AccordionSummary
+                                    expandIcon={<ExpandMoreIcon />}
+                                    aria-controls="panel1a-content"
+                                    id="panel1a-header"
+                                >
+                                    <Typography>Membership info</Typography>
+                                </AccordionSummary>
+                                <AccordionDetails>
+                                    <RegoularH2>Join our Muay Thai gym for only 50€ and dive into the world of martial arts with twice-daily training sessions from 9-11 AM and 5-7 PM. Under the guidance of expert coaches, enhance your skills, strength, and discipline in an environment that celebrates fitness and martial arts culture. Embrace a transformative experience tailored for both beginners and advanced practitioners. Sign up now and become part of a passionate community dedicated to personal and athletic growth.</RegoularH2>
+                                </AccordionDetails>
+                            </Accordion>
                         </Paper>
                     </Box>
                 </Container>
