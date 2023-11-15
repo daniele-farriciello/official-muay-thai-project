@@ -48,33 +48,33 @@ export default function MembershipPage() {
         );
     }
 
-    function validateCardDetails() {
-        const numberValidation = validateCardNumber(cardNumber);
-        if (!numberValidation.isValid) {
-            return "Invalid card number.";
-        }
+    // function validateCardDetails() {
+    //     const numberValidation = validateCardNumber(cardNumber);
+    //     if (!numberValidation.isValid) {
+    //         return "Invalid card number.";
+    //     }
 
-        const cvvValidation = validateCvv(cvv);
-        if (!cvvValidation.isValid) {
-            return "Invalid CVV.";
-        }
+    //     const cvvValidation = validateCvv(cvv);
+    //     if (!cvvValidation.isValid) {
+    //         return "Invalid CVV.";
+    //     }
 
-        const expiryValidation = validateExpirationDate(expiryDate);
-        if (!expiryValidation.isValid) {
-            return "Invalid expiry date.";
-        }
-        return "";
-    }
+    //     const expiryValidation = validateExpirationDate(expiryDate);
+    //     if (!expiryValidation.isValid) {
+    //         return "Invalid expiry date.";
+    //     }
+    //     return "";
+    // }
 
     async function submit(e) {
         e.preventDefault();
 
-        const cardValidationMessage = validateCardDetails();
-        if (cardValidationMessage) {
-            setModalMessage(cardValidationMessage);
-            setModalOpen(true);
-            return;
-        }
+        // const cardValidationMessage = validateCardDetails();
+        // if (cardValidationMessage) {
+        //     setModalMessage(cardValidationMessage);
+        //     setModalOpen(true);
+        //     return;
+        // }
 
         if (!isFormValid()) {
             setModalMessage("Complete the form befor submitting.");
@@ -168,25 +168,41 @@ export default function MembershipPage() {
                 {modalMessage}
             </AlertModal>
             {user && user.member && user.member.activationDay ? (
-                <Container maxWidth="md" sx={{ display: 'flex', justifyContent: 'center-top', alignItems: 'center', height: '100%' }}>
-                    <Box width={"95%"}>
+                <>
+                    <Container maxWidth="sm" sx={{ marginTop: '15%' }} >
                         <Paper
                             sx={{
-                                marginLeft: 6,
+                                display: "flex",
+                                justifyContent: "center",
+                                flexDirection: "column",
                                 padding: 2,
                                 width: '100%',
-                                backgroundColor: alpha(dashboardTheme.palette.secondary.light, 0.5),
-                                borderRadius: '20px'
+                                backgroundColor: alpha(dashboardTheme.palette.secondary.light, 0.4),
+                                borderRadius: '20px',
+
                             }}>
                             <RegoularH2 color={dashboardTheme.palette.primary.light}>{user && user.member && user.member.activationDay ? `Membership Start Date: ${new Date(user.member.activationDay).toLocaleDateString()}` : ''}</RegoularH2>
                             <RegoularH2 color={dashboardTheme.palette.primary.light}><TimeRemaining activationDate={user && user.member && user.member.activationDay ? new Date(user.member.activationDay) : null} /></RegoularH2>
+                            <Accordion>
+                                <AccordionSummary
+                                    expandIcon={<ExpandMoreIcon />}
+                                    aria-controls="panel1a-content"
+                                    id="panel1a-header"
+                                >
+                                    <Typography>Membership info</Typography>
+                                </AccordionSummary>
+                                <AccordionDetails sx={{ height: '200px', overflowY: "scroll" }}>
+                                    <Typography>Join our Muay Thai gym for only €50 a month and dive into the world of martial arts with twice-daily training sessions from 9-11 AM and 5-7 PM. Under the guidance of expert coaches, enhance your skills, strength, and discipline in an environment that celebrates fitness and martial arts culture. Embrace a transformative experience tailored for both beginners and advanced practitioners. Sign up now and become part of a passionate community dedicated to personal and athletic growth.</Typography>
+                                </AccordionDetails>
+                            </Accordion>
                             <Button
                                 variant="contained"
                                 onClick={submitDeletation}
                                 sx={{
+                                    mt: '20px',
                                     fontFamily: 'Playfair Display, serif',
                                     fontWeight: '500%',
-                                    fontSize: '130%',
+                                    fontSize: '110%',
                                     backgroundColor: alpha(dashboardTheme.palette.secondary.light, 1),
                                     transition: 'transform 0.5s, color 0.5s, background 0.5s',
                                     ':hover': {
@@ -197,29 +213,15 @@ export default function MembershipPage() {
                             >
                                 Remove memberhsip
                             </Button>
-                            <Accordion>
-                                <AccordionSummary
-                                    expandIcon={<ExpandMoreIcon />}
-                                    aria-controls="panel1a-content"
-                                    id="panel1a-header"
-                                >
-                                    <Typography>Membership info</Typography>
-                                </AccordionSummary>
-                                <AccordionDetails>
-                                    <RegoularH2>Join our Muay Thai gym for only 50€ and dive into the world of martial arts with twice-daily training sessions from 9-11 AM and 5-7 PM. Under the guidance of expert coaches, enhance your skills, strength, and discipline in an environment that celebrates fitness and martial arts culture. Embrace a transformative experience tailored for both beginners and advanced practitioners. Sign up now and become part of a passionate community dedicated to personal and athletic growth.</RegoularH2>
-                                </AccordionDetails>
-                            </Accordion>
                         </Paper>
-                    </Box>
-                </Container>
-
+                    </Container>
+                </>
             ) : (
                 <>
                     <RegoularH1 color={dashboardTheme.palette.primary.main}>Become a Member</RegoularH1>
-                    <Container maxWidth="sm">
+                    <Container maxWidth="sm" ml={6}>
                         <Paper
                             sx={{
-                                marginLeft: 6,
                                 marginBottom: 3,
                                 width: '95%',
                                 backgroundColor: alpha(dashboardTheme.palette.secondary.light, 0.4),
@@ -243,6 +245,18 @@ export default function MembershipPage() {
                                             onChange={(date) => setExpiryDate(date)}
                                             value={expiryDate}
                                         />
+                                        <Accordion>
+                                            <AccordionSummary
+                                                expandIcon={<ExpandMoreIcon />}
+                                                aria-controls="panel1a-content"
+                                                id="panel1a-header"
+                                            >
+                                                <Typography>Membership info</Typography>
+                                            </AccordionSummary>
+                                            <AccordionDetails sx={{ height: '200px', overflowY: "scroll" }}>
+                                                <Typography>Join our Muay Thai gym for only €50 a month and dive into the world of martial arts with twice-daily training sessions from 9-11 AM and 5-7 PM. Under the guidance of expert coaches, enhance your skills, strength, and discipline in an environment that celebrates fitness and martial arts culture. Embrace a transformative experience tailored for both beginners and advanced practitioners. Sign up now and become part of a passionate community dedicated to personal and athletic growth.</Typography>
+                                            </AccordionDetails>
+                                        </Accordion>
                                         <Button
                                             variant="contained"
                                             onClick={submit}
@@ -261,20 +275,7 @@ export default function MembershipPage() {
                                         </Button>
                                     </Stack>
                                 </form>
-                                <Accordion>
-                                <AccordionSummary
-                                    expandIcon={<ExpandMoreIcon />}
-                                    aria-controls="panel1a-content"
-                                    id="panel1a-header"
-                                >
-                                    <Typography>Membership info</Typography>
-                                </AccordionSummary>
-                                <AccordionDetails>
-                                    <RegoularH2>Join our Muay Thai gym for only 50€ and dive into the world of martial arts with twice-daily training sessions from 9-11 AM and 5-7 PM. Under the guidance of expert coaches, enhance your skills, strength, and discipline in an environment that celebrates fitness and martial arts culture. Embrace a transformative experience tailored for both beginners and advanced practitioners. Sign up now and become part of a passionate community dedicated to personal and athletic growth.</RegoularH2>
-                                </AccordionDetails>
-                            </Accordion>
                             </Box>
-                            
                         </Paper>
                     </Container>
                 </>
