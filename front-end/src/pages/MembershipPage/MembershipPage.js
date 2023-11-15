@@ -261,7 +261,20 @@ export default function MembershipPage() {
                                         </Button>
                                     </Stack>
                                 </form>
+                                <Accordion>
+                                <AccordionSummary
+                                    expandIcon={<ExpandMoreIcon />}
+                                    aria-controls="panel1a-content"
+                                    id="panel1a-header"
+                                >
+                                    <Typography>Membership info</Typography>
+                                </AccordionSummary>
+                                <AccordionDetails>
+                                    <RegoularH2>Join our Muay Thai gym for only 50€ and dive into the world of martial arts with twice-daily training sessions from 9-11 AM and 5-7 PM. Under the guidance of expert coaches, enhance your skills, strength, and discipline in an environment that celebrates fitness and martial arts culture. Embrace a transformative experience tailored for both beginners and advanced practitioners. Sign up now and become part of a passionate community dedicated to personal and athletic growth.</RegoularH2>
+                                </AccordionDetails>
+                            </Accordion>
                             </Box>
+                            
                         </Paper>
                     </Container>
                 </>

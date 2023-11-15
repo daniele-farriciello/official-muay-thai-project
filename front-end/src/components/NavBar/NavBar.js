@@ -163,7 +163,7 @@ export default function NavBar() {
             {user && user.fullName ? `${user.fullName}` : ''}
             {user ? (
               <Tooltip title="Logout">
-                <NewPersonIcon sx={{ marginLeft: '17px'}} onClick={logoutClicked} />
+                <NewPersonIcon sx={{ marginLeft: '17px', cursor: 'pointer'}} onClick={logoutClicked} />
               </Tooltip>
             ) : null}
           </RegoularH2>
