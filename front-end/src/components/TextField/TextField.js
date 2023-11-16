@@ -1,12 +1,12 @@
 import React from 'react';
 import TextField from '@mui/material/TextField';
 
-export default function RegularTextField({ type, name, id, autoComplete, label, children, onChange, placeholder, maxRows, minRows, required, backgroundColor }) {
+export default function RegularTextField({ type, name, id, autoComplete, label, children, onChange, placeholder, maxRows, minRows, required, width= '100%', backgroundColor }) {
 
     return (
         <TextField
             sx={{
-                width: '100%',
+                width: width,
                 backgroundColor: backgroundColor,
                 borderRadius: '5px'
             }}
