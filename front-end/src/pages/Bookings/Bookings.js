@@ -120,16 +120,20 @@ export default function Bookings() {
 
                 {user && user.bookings && user.bookings.length > 0 ? (
                     <>
-                        <Box>
-                            <RegularTextField width="50%" backgroundColor={alpha(dashboardTheme.palette.primary.main, 0.7)} onChange={handleSearch} id="outlined-basic" label="Search Booking" variant="outlined" placeholder="Full me" />
-                            {searchResults.map((booking, index) => (
-                                <List sx={{ width: '100%', maxWidth: 360 }}>
-                                    <ListItem button key={index}>
-                                        <ListItemText primary={booking.fullname} />
-                                    </ListItem>
-                                    <Divider />
-                                </List>
-                            ))}
+                        <Box display={"flex"} alignItems={"center"} flexDirection={"column"} width={'100%'}>
+                            <Box width={'50%'} zIndex={1}>
+                                <RegularTextField backgroundColor={alpha(dashboardTheme.palette.primary.main, 0.7)} onChange={handleSearch} id="outlined-basic" label="Search Booking" variant="outlined" placeholder="Full me" />
+                                {searchResults.map((booking, index) => (
+                                    <List sx={{ p: 0 }}>
+                                        <ListItem button key={index} sx={{ borderRadius: '5px', backgroundColor: alpha(dashboardTheme.palette.primary.main, 0.7)}} >
+                                            <ListItemText  primary={booking.fullname} />
+                                        </ListItem>
+                                        <Divider />
+                                    </List>
+                                ))}
+                            </Box>
+
+                            
                         </Box>
 
                         <Grid container spacing={2} mt={4} justifyContent="center">
