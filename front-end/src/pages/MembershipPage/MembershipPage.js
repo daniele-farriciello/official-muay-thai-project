@@ -10,7 +10,7 @@ import { RegoularH1, RegoularH2 } from "../../components/Typography/Typography";
 import dashboardTheme from '../../components/DashboardTheme/DashboardTheme';
 import AlertModal from "../../components/AlertModal/AlertModal";
 import TimeRemaining from "../../components/TimeRemaining/TimeRemaining";
-import { number as validateCardNumber, cvv as validateCvv, expirationDate as validateExpirationDate } from 'card-validator';
+// import { number as validateCardNumber, cvv as validateCvv, expirationDate as validateExpirationDate } from 'card-validator';
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
