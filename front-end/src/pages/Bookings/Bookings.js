@@ -81,6 +81,7 @@ export default function Bookings() {
     }
 
     const [searchResults, setSearchResults] = useState([]);
+
     // Initialize Fuse with user's bookings
     const fuse = new Fuse(user.bookings, {
         keys: ['fullname'],
@@ -97,6 +98,12 @@ export default function Bookings() {
             setSearchResults([]);
         }
     };
+
+    const [bookingSelected, setBookingSelected] = useState();
+    const  []
+    const bookingSearchClicked = (bookingSelected) => {
+        setBookingSelected(bookingSelected)
+    }
 
     return (
         <div className="bookings-page">
@@ -120,23 +127,40 @@ export default function Bookings() {
 
                 {user && user.bookings && user.bookings.length > 0 ? (
                     <>
-                        <Box display={"flex"} alignItems={"center"} flexDirection={"column"} width={'100%'}>
-                            <Box width={'50%'} zIndex={1}>
+                        <Box sx={{ position: 'relative', width: '100%' }}> {/* Parent container */}
+                            <Box sx={{
+                                position: 'absolute',
+                                top: 0,
+                                left: '50%',
+                                transform: 'translateX(-50%)',
+                                width: '50%',
+                                zIndex: 1
+                            }}>
                                 <RegularTextField backgroundColor={alpha(dashboardTheme.palette.primary.main, 0.7)} onChange={handleSearch} id="outlined-basic" label="Search Booking" variant="outlined" placeholder="Full me" />
                                 {searchResults.map((booking, index) => (
                                     <List sx={{ p: 0 }}>
-                                        <ListItem button key={index} sx={{ borderRadius: '5px', backgroundColor: alpha(dashboardTheme.palette.primary.main, 0.7)}} >
-                                            <ListItemText  primary={booking.fullname} />
+                                        <ListItem
+                                            button
+                                            key={index}
+                                            sx={{
+                                                borderRadius: '5px',
+                                                padding: 0.9,
+                                                backgroundColor: alpha(dashboardTheme.palette.primary.main, 0.7),
+                                                '&:hover': {
+                                                    backgroundColor: alpha(dashboardTheme.palette.primary.dark, 0.8), // Replace with your desired hover color
+                                                }
+                                            }}
+                                            onClick={bookingSearchClicked(booking)}
+                                        >
+                                            <ListItemText primary={booking.fullname} />
                                         </ListItem>
                                         <Divider />
                                     </List>
                                 ))}
                             </Box>
-
-                            
                         </Box>
 
-                        <Grid container spacing={2} mt={4} justifyContent="center">
+                        <Grid container spacing={2} mt={16} justifyContent="center">
                             <Grid item md={8}>
                                 <Paper
                                     sx={{
@@ -146,11 +170,19 @@ export default function Bookings() {
                                         borderRadius: '40px',
                                         backgroundColor: alpha(dashboardTheme.palette.primary.light, 0.6),
                                     }}>
-                                    <div style={{ paddingTop: '30px' }}>
-                                        <RegoularH2>Full Name: {user.bookings[currentPage - 1].fullname}</RegoularH2>
-                                        <RegoularH2>Birthday: {new Date(user.bookings[currentPage - 1].birthdayDate).toLocaleDateString()}</RegoularH2>
-                                        <RegoularH2>Training Date: {new Date(user.bookings[currentPage - 1].trainingDate).toLocaleDateString()}</RegoularH2>
-                                    </div>
+                                    {!bookingSelected ?
+                                        <div style={{ paddingTop: '30px' }}>
+                                            <RegoularH2>Full Name: {user.bookings[currentPage - 1].fullname}</RegoularH2>
+                                            <RegoularH2>Birthday: {new Date(user.bookings[currentPage - 1].birthdayDate).toLocaleDateString()}</RegoularH2>
+                                            <RegoularH2>Training Date: {new Date(user.bookings[currentPage - 1].trainingDate).toLocaleDateString()}</RegoularH2>
+                                        </div>
+                                        :
+                                        <div style={{ paddingTop: '30px' }}>
+                                            <RegoularH2>Full Name: {bookingSelected.fullname}</RegoularH2>
+                                            <RegoularH2>Birthday: {new Date(bookingSelected.birthdayDate).toLocaleDateString()}</RegoularH2>
+                                            <RegoularH2>Training Date: {new Date(bookingSelected.trainingDate).toLocaleDateString()}</RegoularH2>
+                                        </div>
+                                    }
                                     <Grid container justifyContent="center" style={{ marginTop: '20px' }}>
                                         {!modifyOpen ?
                                             <Pagination
