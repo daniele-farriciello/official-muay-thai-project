@@ -3,20 +3,14 @@ import { useNavigate } from "react-router-dom";
 import { useUser } from "../../components/UserContext";
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
-import { Box, Button, Container, alpha } from "@mui/material";
+import { Button, Container, alpha } from "@mui/material";
 import Pagination from '@mui/material/Pagination';
 import '../../App.css';
 import { RegoularH1, RegoularH2 } from "../../components/Typography/Typography";
 import dashboardTheme from '../../components/DashboardTheme/DashboardTheme';
 import AlertModal from "../../components/AlertModal/AlertModal";
-import ModifyFormBooking from "../../components/ModifyFormBooking/ModifyFormBooking";
-
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemText from '@mui/material/ListItemText';
-import Divider from '@mui/material/Divider';
-import Fuse from 'fuse.js';
-import RegularTextField from "../../components/TextField/TextField";
+import ModifyFormBooking from "./ModifyFormBooking/ModifyFormBooking";
+import Search from "./SearchBooking/SearchBooking";
 
 export default function Bookings() {
     const navigate = useNavigate();
@@ -29,10 +23,11 @@ export default function Bookings() {
     const [redirectWithData, setRedirectWithData] = useState(false);
     const [redirectToLogin, setRedirectToLogin] = useState(false);
 
+    const [bookingSearchSelected, setBookingSearchSelected] = useState(null);
 
     function handleNextBooking(event, value) {
         setCurrentPage(value);
-        setBookingSelected(null);
+        setBookingSearchSelected(null);
     }
 
     useEffect(() => {
@@ -82,34 +77,11 @@ export default function Bookings() {
         }
     }
 
-    const [searchResults, setSearchResults] = useState([]);
-
-    // Initialize Fuse with user's bookings
-    const fuse = new Fuse(user && user.bookings ? user.bookings : [], {
-        keys: ['fullname'],
-        includeScore: true
-    });
-
-
-    // Function to handle search
-    const handleSearch = (e) => {
-        const query = e.target.value;
-        if (query) {
-            const results = fuse.search(query).map(result => result.item);
-            setSearchResults(results);
-        } else {
-            setSearchResults([]);
-        }
+    const handleBookingSearchSelected = (selectedSearchBooking) => {
+        setBookingSearchSelected(selectedSearchBooking);
+        const bookingPageIndex = user.bookings.findIndex(booking => booking === selectedSearchBooking) + 1;
+        setCurrentPage(bookingPageIndex);
     };
-
-    const [bookingSelected, setBookingSelected] = useState(null);
-
-    const bookingSearchClicked = (bookingSelected) => {
-            setBookingSelected(bookingSelected)
-            
-            const bookingPageIndex = user.bookings.findIndex(booking => booking === bookingSelected) + 1;
-            setCurrentPage(bookingPageIndex);
-    }
 
     return (
         <div className="bookings-page">
@@ -133,38 +105,7 @@ export default function Bookings() {
 
                 {user && user.bookings && user.bookings.length > 0 ? (
                     <>
-                        <Box sx={{ position: 'relative', width: '100%' }}> {/* Parent container */}
-                            <Box sx={{
-                                position: 'absolute',
-                                top: 0,
-                                left: '50%',
-                                transform: 'translateX(-50%)',
-                                width: '50%',
-                                zIndex: 1
-                            }}>
-                                <RegularTextField backgroundColor={alpha(dashboardTheme.palette.primary.main, 0.7)} onChange={handleSearch} id="outlined-basic" label="Search Booking" variant="outlined" placeholder="Full me" />
-                                {searchResults.map((booking, index) => (
-                                    <List sx={{ p: 0 }}>
-                                        <ListItem
-                                            button
-                                            key={index}
-                                            sx={{
-                                                borderRadius: '5px',
-                                                padding: 0.9,
-                                                backgroundColor: alpha(dashboardTheme.palette.primary.main, 0.7),
-                                                '&:hover': {
-                                                    backgroundColor: alpha(dashboardTheme.palette.primary.dark, 0.8), // Replace with your desired hover color
-                                                }
-                                            }}
-                                            onClick={() => bookingSearchClicked(booking)}
-                                        >
-                                            <ListItemText primary={booking.fullname} />
-                                        </ListItem>
-                                        <Divider />
-                                    </List>
-                                ))}
-                            </Box>
-                        </Box>
+                        <Search onClick={handleBookingSearchSelected} user={user} />
 
                         <Grid container spacing={2} mt={16} justifyContent="center">
                             <Grid item md={8}>
@@ -176,7 +117,7 @@ export default function Bookings() {
                                         borderRadius: '40px',
                                         backgroundColor: alpha(dashboardTheme.palette.primary.light, 0.6),
                                     }}>
-                                    {!bookingSelected ?
+                                    {!bookingSearchSelected ?
                                         <div style={{ paddingTop: '30px' }}>
                                             <RegoularH2>Full Name: {user.bookings[currentPage - 1].fullname}</RegoularH2>
                                             <RegoularH2>Birthday: {new Date(user.bookings[currentPage - 1].birthdayDate).toLocaleDateString()}</RegoularH2>
@@ -184,9 +125,9 @@ export default function Bookings() {
                                         </div>
                                         :
                                         <div style={{ paddingTop: '30px' }}>
-                                            <RegoularH2>Full Name: {bookingSelected.fullname}</RegoularH2>
-                                            <RegoularH2>Birthday: {new Date(bookingSelected.birthdayDate).toLocaleDateString()}</RegoularH2>
-                                            <RegoularH2>Training Date: {new Date(bookingSelected.trainingDate).toLocaleDateString()}</RegoularH2>
+                                            <RegoularH2>Full Name: {bookingSearchSelected.fullname}</RegoularH2>
+                                            <RegoularH2>Birthday: {new Date(bookingSearchSelected.birthdayDate).toLocaleDateString()}</RegoularH2>
+                                            <RegoularH2>Training Date: {new Date(bookingSearchSelected.trainingDate).toLocaleDateString()}</RegoularH2>
                                         </div>
                                     }
                                     <Grid container justifyContent="center" style={{ marginTop: '20px' }}>
@@ -202,7 +143,7 @@ export default function Bookings() {
                                         }
                                     </Grid>
                                     {modifyOpen ?
-                                        <ModifyFormBooking setModifyOpen={setModifyOpen} currentBooking={currentPage} />
+                                        <ModifyFormBooking setModifyOpen={setModifyOpen} setBookingSearchSelected={setBookingSearchSelected} currentBooking={currentPage} />
                                         :
                                         <Grid container justifyContent="center" spacing={3} mt={0.7}>
                                             <Grid item>

@@ -2,15 +2,15 @@ import React, { useState } from "react";
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import { alpha, Button } from '@mui/material';
-import RegularTextField from '../TextField/TextField';
-import CalendarBirthday from '../CalendarBirthday/CalendarBirthday'; // Adjust the import path according to your project
-import CalendarTrainingMembership from '../CalendarTrainingMembership/CalendarTrainingMembership'; // Adjust the import path according to your project
-import dashboardTheme from '../../components/DashboardTheme/DashboardTheme';
-import AlertModal from '../AlertModal/AlertModal';
-import { useUser } from "../../components/UserContext";
+import CalendarBirthday from '../../../components/CalendarBirthday/CalendarBirthday';
+import CalendarTrainingMembership from '../../../components/CalendarTrainingMembership/CalendarTrainingMembership';
+import dashboardTheme from '../../../components/DashboardTheme/DashboardTheme';
+import AlertModal from '../../../components/AlertModal/AlertModal';
+import { useUser } from "../../../components/UserContext";
+import RegularTextField from "../../../components/TextField/TextField";
 
 
-export default function ModifyFormBooking({ setModifyOpen, currentBooking }) {
+export default function ModifyFormBooking({ setModifyOpen, currentBooking, setBookingSearchSelected}) {
     const { user, setUser } = useUser();
     const [fullName, setFullName] = React.useState('');
     const [birthdayDate, setBirthdayDate] = React.useState(null);
@@ -55,6 +55,7 @@ export default function ModifyFormBooking({ setModifyOpen, currentBooking }) {
             if (response.ok) {
                 setModalMessage("Booking modified successfully.");
                 setModalOpen(true);
+                setBookingSearchSelected(null); // update the booking s
                 setUser({ // Update the state to reflect the modified booking
                     ...user,
                     bookings: user.bookings.map((booking, index) =>
