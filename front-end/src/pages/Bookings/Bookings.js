@@ -29,8 +29,10 @@ export default function Bookings() {
     const [redirectWithData, setRedirectWithData] = useState(false);
     const [redirectToLogin, setRedirectToLogin] = useState(false);
 
+
     function handleNextBooking(event, value) {
         setCurrentPage(value);
+        setBookingSelected(null);
     }
 
     useEffect(() => {
@@ -83,10 +85,11 @@ export default function Bookings() {
     const [searchResults, setSearchResults] = useState([]);
 
     // Initialize Fuse with user's bookings
-    const fuse = new Fuse(user.bookings, {
+    const fuse = new Fuse(user && user.bookings ? user.bookings : [], {
         keys: ['fullname'],
         includeScore: true
     });
+
 
     // Function to handle search
     const handleSearch = (e) => {
@@ -99,10 +102,13 @@ export default function Bookings() {
         }
     };
 
-    const [bookingSelected, setBookingSelected] = useState();
-    const  []
+    const [bookingSelected, setBookingSelected] = useState(null);
+
     const bookingSearchClicked = (bookingSelected) => {
-        setBookingSelected(bookingSelected)
+            setBookingSelected(bookingSelected)
+            
+            const bookingPageIndex = user.bookings.findIndex(booking => booking === bookingSelected) + 1;
+            setCurrentPage(bookingPageIndex);
     }
 
     return (
@@ -150,7 +156,7 @@ export default function Bookings() {
                                                     backgroundColor: alpha(dashboardTheme.palette.primary.dark, 0.8), // Replace with your desired hover color
                                                 }
                                             }}
-                                            onClick={bookingSearchClicked(booking)}
+                                            onClick={() => bookingSearchClicked(booking)}
                                         >
                                             <ListItemText primary={booking.fullname} />
                                         </ListItem>
