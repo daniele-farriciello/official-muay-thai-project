@@ -1,13 +1,13 @@
-const express = require("express"); // Load the express module to help create the server.
-const cors = require("cors");  // Load the CORS middleware to enable cross-origin requests.
-const bcrypt = require('bcrypt');  // Load bcrypt for hashing passwords.
-const mongoose = require('mongoose');  // Load mongoose to interact with MongoDB.xw
+const express = require("express"); 
+const cors = require("cors"); 
+const bcrypt = require('bcrypt');
+const mongoose = require('mongoose');
 
 const corsOptions = {
-    origin: 'http://localhost:3000', // Adjust this if your front-end is hosted elsewhere
-    methods: ['GET', 'POST', 'PATCH', 'DELETE'], // Include 'PATCH' in the allowed methods
+    origin: 'http://localhost:3000',
+    methods: ['GET', 'POST', 'PATCH', 'DELETE'],
     credentials: true,
-    optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+    optionsSuccessStatus: 200 
 };
 
 const PORT = 3001;
@@ -116,31 +116,6 @@ app.post('/newBooking', async (req, res) => {
     }
 });
 
-// app.post('/modifyBooking', async (req, res) => {
-//     const { email, fullname, birthdayDate, trainingDate, bookingSelected } = req.body;
-
-//     const user = await User.findOne({ email: email });
-
-//     // Find the index of the booking you want to modify
-//     if (bookingSelected === -1) {
-//         return res.status(404).json({ message: 'Booking not found' });
-//     }
-
-//     // Update the booking at that index
-//     user.bookings[bookingSelected] = {
-//         ...user.bookings[bookingSelected],
-//         fullname,
-//         birthdayDate,
-//         trainingDate
-//     }
-
-//     try {
-//         await user.save();
-//         res.status(200).json({ message: 'Booking modified successfully' });
-//     } catch (error) {
-//         res.status(500).json({ message: 'Error updating booking' });
-//     }
-// });
 
 app.patch('/modifyBooking', async (req, res) => {
     const { email, fullname, birthdayDate, trainingDate, bookingSelected } = req.body;
