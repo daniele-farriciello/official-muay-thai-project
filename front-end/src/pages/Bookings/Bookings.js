@@ -11,6 +11,7 @@ import dashboardTheme from '../../components/DashboardTheme/DashboardTheme';
 import AlertModal from "../../components/AlertModal/AlertModal";
 import ModifyFormBooking from "./ModifyFormBooking/ModifyFormBooking";
 import Search from "./SearchBooking/SearchBooking";
+import axios from "axios";
 
 export default function Bookings() {
     const navigate = useNavigate();
@@ -31,16 +32,28 @@ export default function Bookings() {
     }
 
     useEffect(() => {
-        if (!user) {
-            setModalMessage("Access denied! Login first.");
-            setModalOpen(true);
-            setRedirectToLogin(true);
-        } else if (!user.bookings || user.bookings.length === 0) {
-            setModalMessage("You don't have any bookings yet. Book a private lesson.");
-            setModalOpen(true);
-            setRedirectWithData(true);  // set the flag for redirection
-        }
-    }, [user, navigate]);
+        const checkUserLoggedIn = async () => {
+            try {
+                const response = await axios.get('http://localhost:3001/me', { withCredentials: true });
+                if (response.data) {
+                    // User is logged in, set user data in context
+                    setUser(response.data);
+                } else if (!response.data.bookings || response.data.bookings=== 0) {
+                    setModalMessage("You don't have any bookings yet. Book a private lesson.");
+                    setModalOpen(true);
+                    setRedirectWithData(true);  // set the flag for redirection
+                } else {
+                    // User is not logged in, redirect to login
+                    setRedirectToLogin(true);
+                }
+            } catch (error) {
+                setModalMessage("Access denied! Login first.");
+                setModalOpen(true);
+                setRedirectToLogin(true);
+            }
+        };
+        checkUserLoggedIn();
+    }, [setUser, setModalMessage, setModalOpen, setRedirectToLogin]);
 
     async function deleteBooking() {
         try {

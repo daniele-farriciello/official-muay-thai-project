@@ -11,6 +11,7 @@ import dashboardTheme from '../../components/DashboardTheme/DashboardTheme';
 import AlertModal from "../../components/AlertModal/AlertModal";
 import CalendarBirthday from "../../components/CalendarBirthday/CalendarBirthday";
 import CalendarTrainingMembership from "../../components/CalendarTrainingMembership/CalendarTrainingMembership";
+import axios from "axios";
 
 function NewBooking() {
 
@@ -44,12 +45,25 @@ function NewBooking() {
 
   //Check if user is logged in before to book a lesson
   useEffect(() => {
-    if (!user) {
-      setModalMessage("Access denied! Login first.");
-      setModalOpen(true);
-      setRedirectToLogin(true); 
-    }
-  }, [user, navigate]);
+    const checkUserLoggedIn = async () => {
+      try {
+        const response = await axios.get('http://localhost:3001/me', { withCredentials: true });
+        if (response.data) {
+          // User is logged in, set user data in context
+          setUser(response.data);
+        } else {
+          // User is not logged in, redirect to login
+          setRedirectToLogin(true);
+        }
+      } catch (error) {
+        setModalMessage("Access denied! Login first.");
+        setModalOpen(true);
+        setRedirectToLogin(true);
+      }
+    };
+  
+    checkUserLoggedIn();
+  }, [setUser, setModalMessage, setModalOpen, setRedirectToLogin]);
 
 
   async function submit(e) {

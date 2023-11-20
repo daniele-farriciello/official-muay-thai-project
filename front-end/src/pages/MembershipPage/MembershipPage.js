@@ -16,6 +16,7 @@ import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import axios from "axios";
 
 export default function MembershipPage() {
     const { user, setUser } = useUser();
@@ -34,12 +35,25 @@ export default function MembershipPage() {
     const [redirectToLogin, setRedirectToLogin] = useState(false);
 
     useEffect(() => {
-        if (!user) {
-            setModalMessage("Access denied! Login first.");
-            setModalOpen(true);
-            setRedirectToLogin(true);
-        }
-    }, [user, navigate]);
+        const checkUserLoggedIn = async () => {
+            try {
+                const response = await axios.get('http://localhost:3001/me', { withCredentials: true });
+                if (response.data) {
+                    // User is logged in, set user data in context
+                    setUser(response.data);
+                } else {
+                    // User is not logged in, redirect to login
+                    setRedirectToLogin(true);
+                }
+            } catch (error) {
+                setModalMessage("Access denied! Login first.");
+                setModalOpen(true);
+                setRedirectToLogin(true);
+            }
+        };
+
+        checkUserLoggedIn();
+    }, [setUser, setModalMessage, setModalOpen, setRedirectToLogin]);
 
 
     function isFormValid() {
@@ -88,17 +102,13 @@ export default function MembershipPage() {
         }
 
         try {
-            const response = await fetch('http://localhost:3001/membershipPage', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(member)
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
+            const response = await axios.post('http://localhost:3001/membershipPage', member, { withCredentials: true });
+        
+            // Axios automatically handles JSON conversion, so you can directly access `response.data`
+            const data = response.data;
+        
+            // Axios does not have an 'ok' property. Instead, check the status code.
+            if (response.status === 200) {
                 setModalMessage(data.message);
                 setModalOpen(true);
                 setRedirectWithData(true);
@@ -111,7 +121,8 @@ export default function MembershipPage() {
                 setModalOpen(true);
             }
         } catch (error) {
-            setModalMessage("Network error. Please try again.");
+            // If an error occurs, handle it here. Axios wraps the error as `error.response`
+            setModalMessage(error.response?.data?.message);
             setModalOpen(true);
         }
     }
@@ -122,17 +133,11 @@ export default function MembershipPage() {
         };
 
         try {
-            const response = await fetch('http://localhost:3001/removeMembership', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(member)
-            });
+            const response = await axios.post('http://localhost:3001/removeMembership', member, { withCredentials: true });
 
-            const data = await response.json();
+            const data = response.data;
 
-            if (response.ok) {
+            if (response.status === 200) {
                 setModalMessage(data.message);
                 setModalOpen(true);
                 setUser({

@@ -23,7 +23,7 @@ import { RegoularH2 } from '../Typography/Typography';
 import PersonIcon from '@mui/icons-material/Person';
 import dashboardTheme from '../DashboardTheme/DashboardTheme';
 import Tooltip from '@mui/material/Tooltip';
-
+import axios from "axios";
 
 const drawerWidth = 240;
 
@@ -119,16 +119,11 @@ export default function NavBar() {
 
   async function logoutClicked() {
     try {
-      const response = await fetch('http://localhost:3001/logout', {
-        method: 'POST'
-      });
+      const response = await axios.post('http://localhost:3001/logout', {}, { withCredentials: true });
   
       if (!response.ok) {
-        // If the response is not OK, throw an error
         throw new Error('Logout failed');
       }
-  
-      // Logout successful
       setUser(null); // Clear the user context
       navigate(''); // Navigate to the login page
   
