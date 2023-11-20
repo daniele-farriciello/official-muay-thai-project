@@ -2,6 +2,10 @@ const express = require("express");
 const cors = require("cors"); 
 const bcrypt = require('bcrypt');
 const mongoose = require('mongoose');
+const cookieParser = require('cookie-parser');
+const jwt = require('jsonwebtoken');
+
+const TOKEN_SECRET = 'secret';
 
 const corsOptions = {
     origin: 'http://localhost:3000',
@@ -16,10 +20,12 @@ const app = express();
 app.use(cors(corsOptions));
 
 app.use(express.json());
+app.use(cookieParser());
 
-const dbUrl = "mongodb://localhost:27017/Database-Project";
 
-mongoose.connect(dbUrl, {
+const DB_URL = "mongodb://localhost:27017/Database-Project";
+
+mongoose.connect(DB_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 }).catch(error => console.error("MongoDB connection error:", error));
@@ -40,6 +46,22 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model('User', userSchema);
 
+function auth(req, res, next) {
+    const token = req.cookies.muayThaiAuth;
+    if (!token) {
+        return res.sendStatus(401).json({ message : "Token doesn't exit"});
+    }
+
+    jwt.verify(token, TOKEN_SECRET, (err, cookieContent) => {
+        if (err) {
+            return res.status(403).json({ message : 'Error Token'});
+        }
+
+        req.cookieContent = cookieContent;
+        next(req, res);
+    });
+};
+
 app.get('/user/:email', async (req, res) => {
     const email = req.params.email;
     let user = await User.findOne({ email: email });
@@ -49,7 +71,7 @@ app.get('/user/:email', async (req, res) => {
         delete user.password; // Never send password back
         res.json(user);
     } else {
-        res.status(404).json({ message: 'User not found' });
+        return res.status(404).json({ message: 'User not found' });
     }
 });
 
@@ -93,27 +115,33 @@ app.post('/login', async (req, res) => {
         return res.status(401).json({ message: 'Invalid email or password' });
     }
 
+    const token = jwt.sign({ userId: user._id, email: user.email }, TOKEN_SECRET, { expiresIn: '1h' });
+
+    res.cookie('muayThaiAuth', token, { httpOnly: true, secure: false });
+    res.send('Logged in successfully');
+
     res.status(200).json({ message: 'Logged in successfully' });
 });
 
 
 app.post('/newBooking', async (req, res) => {
-    const { email, fullname, birthdayDate, trainingDate } = req.body;
+    auth(req, res);
+    // const { email, fullname, birthdayDate, trainingDate } = req.body;
 
-    const user = await User.findOne({ email: email });
+    // const user = await User.findOne({ email: email });
 
-    user.bookings.push({
-        fullname,
-        birthdayDate,
-        trainingDate
-    });
+    // user.bookings.push({
+    //     fullname,
+    //     birthdayDate,
+    //     trainingDate
+    // });
 
-    try {
-        await user.save();
-        res.status(200).json({ message: 'Booking added successfully' });
-    } catch (error) {
-        res.status(500).json({ message: 'Error saving booking' });
-    }
+    // try {
+    //     await user.save();
+    //     res.status(200).json({ message: 'Booking added successfully' });
+    // } catch (error) {
+    //     res.status(500).json({ message: 'Error saving booking' });
+    // }
 });
 
 
