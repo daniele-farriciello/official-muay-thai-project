@@ -48,27 +48,34 @@ const User = mongoose.model('User', userSchema);
 
 function auth(req, res, next) {
     const token = req.cookies.muayThaiAuth;
+    // if the user doesn't have any cookie, return 401
     if (!token) {
-        return res.sendStatus(401).json({ message : "Token doesn't exit"});
+        return res.status(401).json({ message: "Token doesn't exit"});
     }
 
+    // if the token exist, verify and refresh the token
     jwt.verify(token, TOKEN_SECRET, (err, cookieContent) => {
         if (err) {
-            return res.status(403).json({ message : 'Error Token'});
+            return res.status(403).json({ message: 'Error Token'});
         }
 
+        // Refreshing the token
+        const { userId, email } = cookieContent;
+        const token = jwt.sign({ userId, email }, TOKEN_SECRET, { expiresIn: '1h' });
+        res.cookie('muayThaiAuth', token, { httpOnly: true, secure: false });
+
         req.cookieContent = cookieContent;
-        next(req, res);
+        next();
     });
 };
 
-app.get('/user/:email', async (req, res) => {
-    const email = req.params.email;
+app.get('/me', auth, async (req, res) => {
+    const email = req.cookieContent.email;
     let user = await User.findOne({ email: email });
 
     if (user) {
         user = user.toObject();
-        delete user.password; // Never send password back
+        delete user.password; // never send password back
         res.json(user);
     } else {
         return res.status(404).json({ message: 'User not found' });
@@ -97,7 +104,7 @@ app.post('/signup', async (req, res) => {
         await newUser.save();
         return res.status(200).json({ message: 'Not exist-New user Added' });
     } catch (error) {
-        res.status(500).json({ message: 'Error saving user' });
+        return res.status(500).json({ message: 'Error saving user' });
     }
 });
 
@@ -118,34 +125,32 @@ app.post('/login', async (req, res) => {
     const token = jwt.sign({ userId: user._id, email: user.email }, TOKEN_SECRET, { expiresIn: '1h' });
 
     res.cookie('muayThaiAuth', token, { httpOnly: true, secure: false });
-    res.send('Logged in successfully');
 
-    res.status(200).json({ message: 'Logged in successfully' });
+    return res.status(200).json({ message: 'Logged in successfully' });
 });
 
 
-app.post('/newBooking', async (req, res) => {
-    auth(req, res);
-    // const { email, fullname, birthdayDate, trainingDate } = req.body;
+app.post('/newBooking', auth, async (req, res) => {
+    const { email, fullname, birthdayDate, trainingDate } = req.body;
 
-    // const user = await User.findOne({ email: email });
+    const user = await User.findOne({ email: email });
 
-    // user.bookings.push({
-    //     fullname,
-    //     birthdayDate,
-    //     trainingDate
-    // });
+    user.bookings.push({
+        fullname,
+        birthdayDate,
+        trainingDate
+    });
 
-    // try {
-    //     await user.save();
-    //     res.status(200).json({ message: 'Booking added successfully' });
-    // } catch (error) {
-    //     res.status(500).json({ message: 'Error saving booking' });
-    // }
+    try {
+        await user.save();
+        res.status(200).json({ message: 'Booking added successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Error saving booking' });
+    }
 });
 
 
-app.patch('/modifyBooking', async (req, res) => {
+app.patch('/modifyBooking', auth, async (req, res) => {
     const { email, fullname, birthdayDate, trainingDate, bookingSelected } = req.body;
 
     // Create an update object dynamically to modify only the specified booking
@@ -173,7 +178,7 @@ app.patch('/modifyBooking', async (req, res) => {
     }
 });
 
-app.post('/membershipPage', async (req, res) => {
+app.post('/membershipPage', auth, async (req, res) => {
     const { email, activationDay } = req.body;
 
     const user = await User.findOne({ email: email });
@@ -188,7 +193,7 @@ app.post('/membershipPage', async (req, res) => {
     }
 });
 
-app.post('/removeMembership', async (req, res) => {
+app.post('/removeMembership', auth, async (req, res) => {
     const { email } = req.body;
 
     const user = await User.findOne({ email: email });
@@ -203,7 +208,7 @@ app.post('/removeMembership', async (req, res) => {
     }
 });
 
-app.delete('/deleteBooking', async (req, res) => {
+app.delete('/deleteBooking', auth, async (req, res) => {
     const { email, bookingSelected } = req.body;
 
     try {
@@ -222,7 +227,8 @@ app.delete('/deleteBooking', async (req, res) => {
     }
 });
 
-app.post('/logout', (req, res) => {
+app.post('/logout', auth, async (req, res) => {
+    // TODO remove cookie
     res.status(200).json({ message: 'Logged out successfully' });
 });
 

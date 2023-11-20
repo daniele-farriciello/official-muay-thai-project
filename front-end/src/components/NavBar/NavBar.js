@@ -132,9 +132,6 @@ export default function NavBar() {
       setUser(null); // Clear the user context
       navigate(''); // Navigate to the login page
   
-      // Optionally, you can handle the data here, if needed
-      // e.g., display a message or perform other logic
-  
     } catch (error) {
       // Handle any errors that occur during fetch
       // setModalMessage(error.message || "Network error. Please try again.");
