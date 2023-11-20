@@ -29,11 +29,11 @@ export default function Login() {
         }
 
         try {
-            const response = await axios.post("http://localhost:3001/login", { email, password });
+            const response = await axios.post("http://localhost:3001/login", { email, password }, { withCredentials: true });
     
             if (response.data.message === "Logged in successfully") {
                 // Fetch the user details after successful login
-                const userResponse = await axios.get(`http://localhost:3001/user/${email}`);
+                const userResponse = await axios.get('http://localhost:3001/me', { withCredentials: true });
                 
                 if (userResponse.data) {
                     // Setting the fetched user details in the global context
