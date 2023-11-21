@@ -38,7 +38,7 @@ export default function Bookings() {
                 if (response.data) {
                     // User is logged in, set user data in context
                     setUser(response.data);
-                } else if (!response.data.bookings || response.data.bookings=== 0) {
+                } else if (!response.data.bookings || response.data.bookings === 0) {
                     setModalMessage("You don't have any bookings yet. Book a private lesson.");
                     setModalOpen(true);
                     setRedirectWithData(true);  // set the flag for redirection
@@ -62,7 +62,7 @@ export default function Bookings() {
                 bookingSelected: currentPage
             }
 
-            const response = await axios.delete('http://localhost:3001/deleteBooking', { bookingToDelete }, { withCredentials: true });
+            const response = await axios.delete('http://localhost:3001/deleteBooking', { data: bookingToDelete, withCredentials: true });
 
             const data = response.data;
 
