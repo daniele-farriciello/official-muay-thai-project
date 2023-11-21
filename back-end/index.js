@@ -228,7 +228,7 @@ app.delete('/deleteBooking', auth, async (req, res) => {
 });
 
 app.post('/logout', auth, async (req, res) => {
-    // TODO remove cookie
+    res.clearCookie('muayThaiAuth');
     res.status(200).json({ message: 'Logged out successfully' });
 });
 

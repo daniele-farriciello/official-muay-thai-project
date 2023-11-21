@@ -57,20 +57,16 @@ export default function Bookings() {
 
     async function deleteBooking() {
         try {
-            const response = await fetch('http://localhost:3001/deleteBooking', {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    email: user.email,
-                    bookingSelected: currentPage
-                }),
-            });
+            const bookingToDelete = {
+                email: user.email,
+                bookingSelected: currentPage
+            }
 
-            const data = await response.json();
+            const response = await axios.delete('http://localhost:3001/deleteBooking', { bookingToDelete }, { withCredentials: true });
 
-            if (response.ok) {
+            const data = response.data;
+
+            if (response.status === 200) {
                 setModalMessage(data.message);
                 setModalOpen(true);
                 setUser({ //it update without refreshing the page the data, in order to shows the last booking added
@@ -83,9 +79,12 @@ export default function Bookings() {
                     setCurrentPage(currentPage - 1);
                 }
 
+            } else {
+                setModalMessage(data.message);
+                setModalOpen(true);
             }
         } catch (error) {
-            setModalMessage(error.message);
+            setModalMessage(error.response?.data?.message);
             setModalOpen(true);
         }
     }

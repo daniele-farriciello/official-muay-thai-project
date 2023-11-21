@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useState } from "react";
 import { styled, useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import MuiDrawer from '@mui/material/Drawer';
@@ -24,6 +24,8 @@ import PersonIcon from '@mui/icons-material/Person';
 import dashboardTheme from '../DashboardTheme/DashboardTheme';
 import Tooltip from '@mui/material/Tooltip';
 import axios from "axios";
+import AlertModal from '../AlertModal/AlertModal';
+
 
 const drawerWidth = 240;
 
@@ -106,6 +108,9 @@ export default function NavBar() {
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
   const { user, setUser } = useUser();
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalMessage, setModalMessage] = useState(null);
+  
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -120,84 +125,95 @@ export default function NavBar() {
   async function logoutClicked() {
     try {
       const response = await axios.post('http://localhost:3001/logout', {}, { withCredentials: true });
-  
-      if (!response.ok) {
-        throw new Error('Logout failed');
+
+      const data = response.data;
+
+      if (response.status === 200) {
+        setModalMessage(data.message);
+        setModalOpen(true);
+        setUser(null);
       }
-      setUser(null); // Clear the user context
-      navigate(''); // Navigate to the login page
-  
     } catch (error) {
-      // Handle any errors that occur during fetch
-      // setModalMessage(error.message || "Network error. Please try again.");
-      // setModalOpen(true);
+      setModalMessage(error.response?.data?.message);
+      setModalOpen(true);
     }
   }
-  
+
   return (
-    <Box sx={{ display: 'flex' }} marginBottom={8}>
-      <CssBaseline />
-      <AppBar position="fixed" open={open}>
-        <Toolbar sx={{ justifyContent: 'space-between' }}>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            onClick={handleDrawerOpen}
-            edge="start"
-            sx={{
-              marginRight: 5,
-              ...(open && { display: 'none' }),
-            }}
-          >
-            <MenuIcon />
-          </IconButton>
-          <RegoularH2>
-            {user && user.fullName ? `${user.fullName}` : ''}
-            {user ? (
-              <Tooltip title="Logout">
-                <NewPersonIcon sx={{ marginLeft: '17px', cursor: 'pointer'}} onClick={logoutClicked} />
-              </Tooltip>
-            ) : null}
-          </RegoularH2>
-        </Toolbar>
-      </AppBar>
-      <Drawer variant="permanent" open={open}>
-        <DrawerHeader>
-          <IconButton onClick={handleDrawerClose}>
-            {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
-          </IconButton>
-        </DrawerHeader>
-        <Divider />
-        <List>
-          {navBarItems.map((item, index) => (
-            <ListItem
-              key={item.id}
-              disablePadding
-              sx={{ display: 'block' }}
-              onClick={() => navigate(item.route)}
+    <>
+      <AlertModal
+        open={modalOpen}
+        onClose={() => {
+          setModalOpen(false);
+          setModalMessage(null);
+          navigate('');
+        }}>
+        {modalMessage}
+      </AlertModal>
+      <Box sx={{ display: 'flex' }} marginBottom={8}>
+        <CssBaseline />
+        <AppBar position="fixed" open={open}>
+          <Toolbar sx={{ justifyContent: 'space-between' }}>
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              onClick={handleDrawerOpen}
+              edge="start"
+              sx={{
+                marginRight: 5,
+                ...(open && { display: 'none' }),
+              }}
             >
-              <ListItemButton
-                sx={{
-                  minHeight: 48,
-                  justifyContent: open ? 'initial' : 'center',
-                  px: 2.5,
-                }}
+              <MenuIcon />
+            </IconButton>
+            <RegoularH2>
+              {user && user.fullName ? `${user.fullName}` : ''}
+              {user ? (
+                <Tooltip title="Logout">
+                  <NewPersonIcon sx={{ marginLeft: '17px', cursor: 'pointer' }} onClick={logoutClicked} />
+                </Tooltip>
+              ) : null}
+            </RegoularH2>
+          </Toolbar>
+        </AppBar>
+        <Drawer variant="permanent" open={open}>
+          <DrawerHeader>
+            <IconButton onClick={handleDrawerClose}>
+              {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+            </IconButton>
+          </DrawerHeader>
+          <Divider />
+          <List>
+            {navBarItems.map((item, index) => (
+              <ListItem
+                key={item.id}
+                disablePadding
+                sx={{ display: 'block' }}
+                onClick={() => navigate(item.route)}
               >
-                <ListItemIcon
+                <ListItemButton
                   sx={{
-                    minWidth: 0,
-                    mr: open ? 3 : 'auto',
-                    justifyContent: 'center',
+                    minHeight: 48,
+                    justifyContent: open ? 'initial' : 'center',
+                    px: 2.5,
                   }}
                 >
-                  {item.icon}
-                </ListItemIcon>
-                <ListItemText primary={item.label} sx={{ opacity: open ? 1 : 0 }} />
-              </ListItemButton>
-            </ListItem>
-          ))}
-        </List>
-      </Drawer>
-    </Box>
+                  <ListItemIcon
+                    sx={{
+                      minWidth: 0,
+                      mr: open ? 3 : 'auto',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    {item.icon}
+                  </ListItemIcon>
+                  <ListItemText primary={item.label} sx={{ opacity: open ? 1 : 0 }} />
+                </ListItemButton>
+              </ListItem>
+            ))}
+          </List>
+        </Drawer>
+      </Box>
+    </>
   );
 }

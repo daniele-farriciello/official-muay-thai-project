@@ -121,7 +121,6 @@ export default function MembershipPage() {
                 setModalOpen(true);
             }
         } catch (error) {
-            // If an error occurs, handle it here. Axios wraps the error as `error.response`
             setModalMessage(error.response?.data?.message);
             setModalOpen(true);
         }
