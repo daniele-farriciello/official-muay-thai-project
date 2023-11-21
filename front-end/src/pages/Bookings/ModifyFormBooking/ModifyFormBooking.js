@@ -8,6 +8,7 @@ import dashboardTheme from '../../../components/DashboardTheme/DashboardTheme';
 import AlertModal from '../../../components/AlertModal/AlertModal';
 import { useUser } from "../../../components/UserContext";
 import RegularTextField from "../../../components/TextField/TextField";
+import axios from "axios";
 
 
 export default function ModifyFormBooking({ setModifyOpen, currentBooking, setBookingSearchSelected}) {
@@ -44,16 +45,11 @@ export default function ModifyFormBooking({ setModifyOpen, currentBooking, setBo
         };
 
         try {
-            const response = await fetch('http://localhost:3001/modifyBooking', {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(modifiedBookingData),
-            });
+            const response = await axios.patch('http://localhost:3001/modifyBooking', { modifiedBookingData } ,{ withCredentials: true });
+            const data = response.data;
 
-            if (response.ok) {
-                setModalMessage("Booking modified successfully.");
+            if (response.status === 200) {
+                setModalMessage(data.message);
                 setModalOpen(true);
                 setBookingSearchSelected(null); // update the booking s
                 setUser({ // Update the state to reflect the modified booking
@@ -64,7 +60,7 @@ export default function ModifyFormBooking({ setModifyOpen, currentBooking, setBo
                 });
             }
         } catch (error) {
-            setModalMessage(error.message);
+            setModalMessage(error.response?.data?.message);
             setModalOpen(true);
         }
 
