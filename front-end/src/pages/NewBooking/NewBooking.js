@@ -1,4 +1,4 @@
-import  RegularTextField from "../../components/TextField/TextField";
+import RegularTextField from "../../components/TextField/TextField";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button, Paper } from "@mui/material";
@@ -61,7 +61,7 @@ function NewBooking() {
         setRedirectToLogin(true);
       }
     };
-  
+
     checkUserLoggedIn();
   }, [setUser, setModalMessage, setModalOpen, setRedirectToLogin]);
 
@@ -83,21 +83,14 @@ function NewBooking() {
     };
 
     try {
-      const response = await fetch('http://localhost:3001/newBooking', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(bookingData)
-      });
+      const response = await axios.post('http://localhost:3001/newBooking', bookingData, { withCredentials: true });
+      const data = response.data;
 
-      const data = await response.json();
-
-      if (response.ok) {
+      if (response.status === 200) {
         setModalMessage(data.message);
         setModalOpen(true);
-        setRedirectWithData(true);  // set the flag for redirection
-        setUser({ //it update without refreshing the page the data, in order to shows the last booking added
+        setRedirectWithData(true);
+        setUser({
           ...user,
           bookings: [...user.bookings, bookingData]
         });
@@ -107,7 +100,7 @@ function NewBooking() {
         setModalOpen(true);
       }
     } catch (error) {
-      setModalMessage("Network error. Please try again.");
+      setModalMessage(error.response?.data?.message);
       setModalOpen(true);
     }
   }
@@ -152,8 +145,8 @@ function NewBooking() {
                   placeholder="Furname Surname"
                   onChange={(e) => setFullName(e.target.value)}
                   value={fullName}
-                  name="fullName" 
-                  id="fullName" 
+                  name="fullName"
+                  id="fullName"
                   autoComplete="given-name"
                 />
                 <CalendarBirthday
@@ -168,9 +161,9 @@ function NewBooking() {
                   value={trainingDate}
                   label="Training Date"
                 />
-                <RegularTextField backgroundColor={alpha(dashboardTheme.palette.primary.main, 0.7)} onChange={(e) => setCardName(e.target.value)} value={cardName} label="Name on Card" placeholder="Furname Surname" name="fullNameCard" id="fullNameCard" autoComplete="given-name"/>
-                <RegularTextField backgroundColor={alpha(dashboardTheme.palette.primary.main, 0.7)} onChange={(e) => setCardNumber(e.target.value)} value={cardNumber} label="Card Number" placeholder="0000 0000 0000 0000" name="card-number" id="card-number" autoComplete="card-number"/>
-                <RegularTextField backgroundColor={alpha(dashboardTheme.palette.primary.main, 0.7)} onChange={(e) => setCvv(e.target.value)} value={cvv} label="CVV" placeholder="000" required={true} minRows={3} maxRow={3} name="expire-number" id="expire-number" autoComplete="expire-number"/>
+                <RegularTextField backgroundColor={alpha(dashboardTheme.palette.primary.main, 0.7)} onChange={(e) => setCardName(e.target.value)} value={cardName} label="Name on Card" placeholder="Furname Surname" name="fullNameCard" id="fullNameCard" autoComplete="given-name" />
+                <RegularTextField backgroundColor={alpha(dashboardTheme.palette.primary.main, 0.7)} onChange={(e) => setCardNumber(e.target.value)} value={cardNumber} label="Card Number" placeholder="0000 0000 0000 0000" name="card-number" id="card-number" autoComplete="card-number" />
+                <RegularTextField backgroundColor={alpha(dashboardTheme.palette.primary.main, 0.7)} onChange={(e) => setCvv(e.target.value)} value={cvv} label="CVV" placeholder="000" required={true} minRows={3} maxRow={3} name="expire-number" id="expire-number" autoComplete="expire-number" />
                 <CalendarPaymentField
                   backgroundColor={alpha(dashboardTheme.palette.primary.main, 0.7)}
                   label="Expire Date"
