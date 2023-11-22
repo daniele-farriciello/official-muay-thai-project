@@ -10,7 +10,7 @@ import dashboardTheme from '../DashboardTheme/DashboardTheme';
 const style = {
   position: 'absolute',
   top: '50%',
-  left: '50%',
+  left: '49%',
   transform: 'translate(-50%, -50%)',
   backgroundColor: alpha(dashboardTheme.palette.primary.main, 0.9),
   borderRadius: '20px',

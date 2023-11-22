@@ -129,7 +129,6 @@ function NewBooking() {
       <Container maxWidth="sm">
         <Paper
           sx={{
-            marginLeft: 4,
             marginBottom: 3,
             width: '95%',
             backgroundColor: alpha(dashboardTheme.palette.secondary.light, 0.4),
