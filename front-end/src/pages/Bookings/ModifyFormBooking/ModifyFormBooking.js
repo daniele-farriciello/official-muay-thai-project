@@ -19,6 +19,7 @@ export default function ModifyFormBooking({ setModifyOpen, currentBooking, setBo
 
     const [modalOpen, setModalOpen] = useState(false);
     const [modalMessage, setModalMessage] = useState(null);
+    const [bookingBeenModified, setBookingBeenModified] = useState(false);
 
     function isFormValid() {
         return (
@@ -34,7 +35,7 @@ export default function ModifyFormBooking({ setModifyOpen, currentBooking, setBo
             setModalMessage("Complete the form befor submitting.");
             setModalOpen(true);
             return;
-        }
+          }
 
         const modifiedBookingData = {
             email: user.email,
@@ -45,7 +46,7 @@ export default function ModifyFormBooking({ setModifyOpen, currentBooking, setBo
         };
 
         try {
-            const response = await axios.patch('http://localhost:3001/modifyBooking', { modifiedBookingData } ,{ withCredentials: true });
+            const response = await axios.patch('http://localhost:3001/modifyBooking', modifiedBookingData ,{ withCredentials: true });
             const data = response.data;
 
             if (response.status === 200) {
@@ -58,7 +59,7 @@ export default function ModifyFormBooking({ setModifyOpen, currentBooking, setBo
                         index === modifiedBookingData.bookingSelected ? modifiedBookingData : booking
                     )
                 });
-                console.log(user)
+                setBookingBeenModified(true)
             }
         } catch (error) {
             setModalMessage(error.response?.data?.message);
@@ -74,7 +75,8 @@ export default function ModifyFormBooking({ setModifyOpen, currentBooking, setBo
                 onClose={() => {
                     setModalOpen(false);
                     setModalMessage(null);
-                    setModifyOpen(false);
+                    bookingBeenModified ? setModifyOpen(false) : setModifyOpen(true);             
+                    setBookingBeenModified(false)
                 }}>
                 {modalMessage}
             </AlertModal>

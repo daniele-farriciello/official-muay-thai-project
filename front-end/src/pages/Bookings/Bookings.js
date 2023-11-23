@@ -33,7 +33,6 @@ export default function Bookings() {
 
     useEffect(() => {
         const checkUserLoggedIn = async () => {
-            console.log(user)
             try {
                 const response = await axios.get('http://localhost:3001/me', { withCredentials: true });
                 if (response.data) {
@@ -71,22 +70,19 @@ export default function Bookings() {
             const data = response.data;
 
             if (response.status === 200) {
-                setModalMessage(data.message);
+                setModalMessage(response.data.message);
                 setModalOpen(true);
-                setUser({ //it update without refreshing the page the data, in order to shows the last booking added
-                    ...user,
-                    bookings: [...user.bookings.filter((booking, index) => {
-                        return index !== currentPage - 1
-                    })]
-                });
-                if (currentPage !== 1) {
-                    setCurrentPage(currentPage - 1);
+                const updatedBookings = user.bookings.filter((_, index) => index !== currentPage - 1);
+                setUser({ ...user, bookings: updatedBookings });
+    
+                if (updatedBookings.length === 0) {
+                    setModalMessage("You don't have any bookings anymore. Book a private lesson.");
+                    setRedirectWithData(true);
+                    setModalOpen(true);
                 }
 
-                if (!response.data.bookings || response.data.bookings.length === 0) {
-                    setModalMessage("You don't have any bookings anymore. Book a private lesson.");
-                    setModalOpen(true);
-                    setRedirectWithData(true);  // set the flag for redirection
+                if (currentPage !== 1 && updatedBookings.length < currentPage) {
+                    setCurrentPage(currentPage - 1);
                 }
 
             } else {
