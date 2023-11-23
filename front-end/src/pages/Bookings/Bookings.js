@@ -33,18 +33,22 @@ export default function Bookings() {
 
     useEffect(() => {
         const checkUserLoggedIn = async () => {
+            console.log(user)
             try {
                 const response = await axios.get('http://localhost:3001/me', { withCredentials: true });
                 if (response.data) {
                     // User is logged in, set user data in context
                     setUser(response.data);
-                } else if (!response.data.bookings || response.data.bookings === 0) {
-                    setModalMessage("You don't have any bookings yet. Book a private lesson.");
-                    setModalOpen(true);
-                    setRedirectWithData(true);  // set the flag for redirection
                 } else {
                     // User is not logged in, redirect to login
                     setRedirectToLogin(true);
+                }
+
+                if (!response.data.bookings || response.data.bookings.length === 0) {
+                    setModalMessage("You don't have any bookings yet. Book a private lesson.");
+                    setModalOpen(true);
+                    setRedirectWithData(true);  // set the flag for redirection
+                
                 }
             } catch (error) {
                 setModalMessage("Access denied! Login first.");
@@ -77,6 +81,12 @@ export default function Bookings() {
                 });
                 if (currentPage !== 1) {
                     setCurrentPage(currentPage - 1);
+                }
+
+                if (!response.data.bookings || response.data.bookings.length === 0) {
+                    setModalMessage("You don't have any bookings anymore. Book a private lesson.");
+                    setModalOpen(true);
+                    setRedirectWithData(true);  // set the flag for redirection
                 }
 
             } else {

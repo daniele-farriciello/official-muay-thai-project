@@ -51,13 +51,14 @@ export default function ModifyFormBooking({ setModifyOpen, currentBooking, setBo
             if (response.status === 200) {
                 setModalMessage(data.message);
                 setModalOpen(true);
-                setBookingSearchSelected(null); // update the booking s
-                setUser({ // Update the state to reflect the modified booking
+                setBookingSearchSelected(null); 
+                setUser({
                     ...user,
                     bookings: user.bookings.map((booking, index) =>
                         index === modifiedBookingData.bookingSelected ? modifiedBookingData : booking
                     )
                 });
+                console.log(user)
             }
         } catch (error) {
             setModalMessage(error.response?.data?.message);
