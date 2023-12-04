@@ -172,7 +172,7 @@ app.patch('/modifyBooking', auth, async (req, res) => {
     };
 
     try {
-        const result = await User.updateOne(
+        const result = await User.updateOne(   // Asynchronously updating the user document in the database. / updateOne: used to update a single document in a MongoDB 
             { email: email },
             { $set: update }
         );
@@ -233,7 +233,7 @@ app.delete('/deleteBooking', auth, async (req, res) => {
             return res.status(404).json({ message: 'Booking not found' });
         }
 
-        user.bookings.splice(bookingSelected - 1, 1);
+        user.bookings.splice(bookingSelected - 1, 1);  // "remove one booking from the bookings array, starting at the index bookingSelected - 1."
 
         await user.save();
         res.status(200).json({ message: 'Booking deleted successfully' });
