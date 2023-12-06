@@ -43,7 +43,7 @@ function NewBooking() {
     );
   };
 
-  //Check if user is logged in before to book a lesson
+  //Check if user is logged in before to book a lesson.
   useEffect(() => {
     const checkUserLoggedIn = async () => {
       try {
