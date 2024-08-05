@@ -3,7 +3,7 @@ import Fuse from 'fuse.js';
 import { Box, List, ListItem, ListItemText, Divider, alpha } from '@mui/material';
 import RegularTextField from '../../../components/TextField/TextField';
 import dashboardTheme from '../../../components/DashboardTheme/DashboardTheme';
-// comment
+
 export default function Search({ onClick, user }) {
     const [searchResults, setSearchResults] = useState([]);
 
